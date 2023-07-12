@@ -1,6 +1,6 @@
 {
-  "name": "svelte-simple-modal",
-  "version": "1.6.1",
+  "name": "@tarnadas/svelte-simple-modal",
+  "version": "1.6.3",
   "description": "A small and simple modal for Svelte",
   "type": "module",
   "svelte": "src/index.js",

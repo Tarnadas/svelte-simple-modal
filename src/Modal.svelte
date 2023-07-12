@@ -219,33 +219,6 @@
    */
   export let disableFocusTrap = false;
 
-  const defaultState = {
-    id,
-    ariaLabel,
-    ariaLabelledBy,
-    closeButton,
-    closeOnEsc,
-    closeOnOuterClick,
-    styleBg,
-    styleWindowWrap,
-    styleWindow,
-    styleContent,
-    styleCloseButton,
-    classBg,
-    classWindowWrap,
-    classWindow,
-    classContent,
-    classCloseButton,
-    transitionBg,
-    transitionBgProps,
-    transitionWindow,
-    transitionWindowProps,
-    disableFocusTrap,
-    isTabbable,
-    unstyled,
-  };
-  let state = { ...defaultState };
-
   let Component = null;
 
   let background;
@@ -285,15 +258,15 @@
           width: window.innerWidth,
           height: window.innerHeight,
         },
-        state.styleBg
+        styleBg
       )
     );
-    cssWindowWrap = toCssString(state.styleWindowWrap);
-    cssWindow = toCssString(state.styleWindow);
-    cssContent = toCssString(state.styleContent);
-    cssCloseButton = toCssString(state.styleCloseButton);
-    currentTransitionBg = state.transitionBg;
-    currentTransitionWindow = state.transitionWindow;
+    cssWindowWrap = toCssString(styleWindowWrap);
+    cssWindow = toCssString(styleWindow);
+    cssContent = toCssString(styleContent);
+    cssCloseButton = toCssString(styleCloseButton);
+    currentTransitionBg = transitionBg;
+    currentTransitionWindow = transitionWindow;
   };
 
   const toVoid = () => {};
@@ -310,7 +283,31 @@
    */
   const open = (NewComponent, newProps = {}, options = {}, callbacks = {}) => {
     Component = bind(NewComponent, newProps);
-    state = { ...defaultState, ...options };
+    if (options.id != null) id = options.id;
+    if (options.ariaLabel != null) ariaLabel = options.ariaLabel;
+    if (options.ariaLabelledBy != null) ariaLabelledBy = options.ariaLabelledBy;
+    if (options.closeButton != null) closeButton = options.closeButton;
+    if (options.closeOnEsc != null) closeOnEsc = options.closeOnEsc;
+    if (options.closeOnOuterClick != null)
+      closeOnOuterClick = options.closeOnOuterClick;
+    if (options.styleBg != null) styleBg = options.styleBg;
+    if (options.styleWindowWrap != null)
+      styleWindowWrap = options.styleWindowWrap;
+    if (options.classWindow != null) classWindow = options.classWindow;
+    if (options.classContent != null) classContent = options.classContent;
+    if (options.classCloseButton != null)
+      classCloseButton = options.classCloseButton;
+    if (options.transitionBg != null) transitionBg = options.transitionBg;
+    if (options.transitionBgProps != null)
+      transitionBgProps = options.transitionBgProps;
+    if (options.transitionWindow != null)
+      transitionWindow = options.transitionWindow;
+    if (options.transitionWindowProps != null)
+      transitionWindowProps = options.transitionWindowProps;
+    if (options.disableFocusTrap != null)
+      disableFocusTrap = options.disableFocusTrap;
+    if (options.isTabbable != null) isTabbable = options.isTabbable;
+    if (options.unstyled != null) unstyled = options.unstyled;
     updateStyleTransition();
     disableScroll();
     onOpen = (event) => {
@@ -374,16 +371,16 @@
   };
 
   const handleKeydown = (event) => {
-    if (state.closeOnEsc && Component && event.key === 'Escape') {
+    if (closeOnEsc && Component && event.key === 'Escape') {
       event.preventDefault();
       close();
     }
 
-    if (Component && event.key === 'Tab' && !state.disableFocusTrap) {
+    if (Component && event.key === 'Tab' && !disableFocusTrap) {
       // trap focus
       const nodes = modalWindow.querySelectorAll('*');
       const tabbable = Array.from(nodes)
-        .filter(state.isTabbable)
+        .filter(isTabbable)
         .sort((a, b) => a.tabIndex - b.tabIndex);
 
       let index = tabbable.indexOf(document.activeElement);
@@ -399,14 +396,14 @@
 
   const handleOuterMousedown = (event) => {
     if (
-      state.closeOnOuterClick &&
+      closeOnOuterClick &&
       (event.target === background || event.target === wrap)
     )
       outerClickTarget = event.target;
   };
 
   const handleOuterMouseup = (event) => {
-    if (state.closeOnOuterClick && event.target === outerClickTarget) {
+    if (closeOnOuterClick && event.target === outerClickTarget) {
       event.preventDefault();
       close();
     }
@@ -469,42 +466,42 @@
 {#if Component}
   <div
     aria-hidden="true"
-    id={state.id}
-    class={state.classBg}
+    {id}
+    class={classBg}
     class:bg={!unstyled}
     on:mousedown={handleOuterMousedown}
     on:mouseup={handleOuterMouseup}
     bind:this={background}
-    transition:currentTransitionBg={state.transitionBgProps}
+    transition:currentTransitionBg={transitionBgProps}
     style={cssBg}
   >
     <div
-      class={state.classWindowWrap}
+      class={classWindowWrap}
       class:wrap={!unstyled}
       bind:this={wrap}
       style={cssWindowWrap}
     >
       <div
-        class={state.classWindow}
+        class={classWindow}
         class:window={!unstyled}
         role="dialog"
         aria-modal="true"
-        aria-label={state.ariaLabelledBy ? null : state.ariaLabel || null}
-        aria-labelledby={state.ariaLabelledBy || null}
+        aria-label={ariaLabelledBy ? null : ariaLabel || null}
+        aria-labelledby={ariaLabelledBy || null}
         bind:this={modalWindow}
-        transition:currentTransitionWindow={state.transitionWindowProps}
+        transition:currentTransitionWindow={transitionWindowProps}
         on:introstart={onOpen}
         on:outrostart={onClose}
         on:introend={onOpened}
         on:outroend={onClosed}
         style={cssWindow}
       >
-        {#if state.closeButton}
-          {#if isFunction(state.closeButton)}
-            <svelte:component this={state.closeButton} onClose={close} />
+        {#if closeButton}
+          {#if isFunction(closeButton)}
+            <svelte:component this={closeButton} onClose={close} />
           {:else}
             <button
-              class={state.classCloseButton}
+              class={classCloseButton}
               class:close={!unstyled}
               aria-label="Close modal"
               on:click={close}
@@ -513,11 +510,7 @@
             />
           {/if}
         {/if}
-        <div
-          class={state.classContent}
-          class:content={!unstyled}
-          style={cssContent}
-        >
+        <div class={classContent} class:content={!unstyled} style={cssContent}>
           <svelte:component this={Component} />
         </div>
       </div>
